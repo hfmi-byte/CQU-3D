@@ -10,7 +10,9 @@ services:
       context: ../..
       dockerfile: infra/docker/worker.Dockerfile
       additional_contexts:
+
         dynamic2dgs: ../../../2d-gaussian-splatting
+
         wheelhouse: ../../../whl
     env_file:
       - ./.env.gpu
