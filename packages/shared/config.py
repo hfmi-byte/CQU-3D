@@ -85,7 +85,7 @@ class AppSettings(BaseSettings):
     max_projects_per_user: int = 5
     max_global_storage: int | str = 200 * GB
 
-    dynamic_2dgs_root: str = "/workspace/repo/services/dynamic-2dgs"
+    dynamic_2dgs_root: str = "/workspace/repo/services/2d-gaussian-splatting"
     gs_python: str = "/usr/local/bin/python"
     colmap_bin: str = "colmap"
     ffmpeg_bin: str = "ffmpeg"

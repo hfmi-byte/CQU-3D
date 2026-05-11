@@ -10,7 +10,7 @@ services:
       context: ../..
       dockerfile: infra/docker/worker.Dockerfile
       additional_contexts:
-        dynamic2dgs: ../../../dynamic-2dgsdynamic-2dgs
+        dynamic2dgs: ../../../2d-gaussian-splatting
         wheelhouse: ../../../whl
     env_file:
       - ./.env.gpu
@@ -28,7 +28,7 @@ services:
       WORKSPACE_DIR: /workspace/repo/storage/workspace
       OUTPUT_DIR: /workspace/repo/storage/output
       LOG_DIR: /workspace/repo/storage/logs
-      DYNAMIC_2DGS_ROOT: /workspace/repo/services/dynamic-2dgs
+      DYNAMIC_2DGS_ROOT: /workspace/repo/services/2d-gaussian-splatting
       WORKER_ID: ${WORKER_ID}
       WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-1}
       NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}

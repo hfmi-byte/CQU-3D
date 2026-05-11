@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PYTHON_BIN="${PYTHON_BIN:-python}"
-D2DGS_ROOT="${D2DGS_ROOT:-/workspace/repo/services/dynamic-2dgs}"
+D2DGS_ROOT="${D2DGS_ROOT:-/workspace/repo/services/2d-gaussian-splatting}"
 WHEELHOUSE="${WHEELHOUSE:-/workspace/repo/infra/docker/wheels}"
 export TORCH_CUDA_ARCH_LIST="${TORCH_CUDA_ARCH_LIST:-8.0;8.6;8.9}"
 
@@ -10,8 +10,6 @@ TORCH_WHEEL="torch-2.1.0+cu121-cp310-cp310-linux_x86_64.whl"
 TORCHVISION_WHEEL="torchvision-0.16.0+cu121-cp310-cp310-linux_x86_64.whl"
 TORCHAUDIO_WHEEL="torchaudio-2.1.0+cu121-cp310-cp310-linux_x86_64.whl"
 
-PYTORCH3D_WHEEL="pytorch3d-0.7.5-cp310-cp310-linux_x86_64.whl"
-DEARPYGUI_WHEEL="dearpygui-1.11.1-cp310-cp310-manylinux1_x86_64.whl"
 IMAGEIO_WHEEL="imageio-2.35.1-py3-none-any.whl"
 SCIPY_WHEEL="scipy-1.10.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
 PLYFILE_WHEEL="plyfile-1.0.3-py3-none-any.whl"
@@ -46,10 +44,6 @@ require_file "${WHEELHOUSE}/${TORCHAUDIO_WHEEL}"
 
 require_file "${D2DGS_ROOT}/submodules/diff-surfel-rasterization/setup.py"
 require_file "${D2DGS_ROOT}/submodules/simple-knn/setup.py"
-require_file "${D2DGS_ROOT}/nvdiffrast/setup.py"
-
-require_file "${WHEELHOUSE}/${PYTORCH3D_WHEEL}"
-require_file "${WHEELHOUSE}/${DEARPYGUI_WHEEL}"
 require_file "${WHEELHOUSE}/${IMAGEIO_WHEEL}"
 require_file "${WHEELHOUSE}/${SCIPY_WHEEL}"
 require_file "${WHEELHOUSE}/${PLYFILE_WHEEL}"
@@ -75,12 +69,9 @@ echo "[build] building CUDA extensions"
 echo "[build] TORCH_CUDA_ARCH_LIST=${TORCH_CUDA_ARCH_LIST}"
 ${PYTHON_BIN} -m pip install --no-build-isolation "${D2DGS_ROOT}/submodules/diff-surfel-rasterization"
 ${PYTHON_BIN} -m pip install --no-build-isolation "${D2DGS_ROOT}/submodules/simple-knn"
-${PYTHON_BIN} -m pip install --no-build-isolation "${D2DGS_ROOT}/nvdiffrast"
 
 echo "[build] installing local wheelhouse packages"
 ${PYTHON_BIN} -m pip install --no-deps \
-  "${WHEELHOUSE}/${PYTORCH3D_WHEEL}" \
-  "${WHEELHOUSE}/${DEARPYGUI_WHEEL}" \
   "${WHEELHOUSE}/${IMAGEIO_WHEEL}" \
   "${WHEELHOUSE}/${PLYFILE_WHEEL}" \
   "${WHEELHOUSE}/${LPIPS_WHEEL}"
@@ -92,12 +83,8 @@ ${PYTHON_BIN} -m pip install \
   "${WHEELHOUSE}/${MATPLOTLIB_WHEEL}" \
   "${WHEELHOUSE}/${OPEN3D_WHEEL}"
 
-echo "[build] installing dynamic-2dgs runtime python deps"
+echo "[build] installing 2d-gaussian-splatting runtime python deps"
 ${PYTHON_BIN} -m pip install \
-  iopath==0.1.9 \
-  fvcore==0.1.5.post20221221 \
-  piq==0.8.0 \
-  pytorch-msssim==1.0.0 \
   mediapy==1.2.2 \
   trimesh==4.4.9
 
@@ -106,9 +93,6 @@ required = [
     "torch",
     "diff_surfel_rasterization",
     "simple_knn",
-    "nvdiffrast.torch",
-    "pytorch3d",
-    "dearpygui.dearpygui",
     "imageio",
     "scipy",
     "plyfile",
@@ -116,10 +100,6 @@ required = [
     "lpips",
     "matplotlib",
     "open3d",
-    "iopath",
-    "fvcore",
-    "piq",
-    "pytorch_msssim",
     "mediapy",
     "trimesh",
 ]

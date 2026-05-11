@@ -119,7 +119,7 @@ class GSRunner:
         await self._notify(on_progress, "running", 15, "Running COLMAP reconstruction")
         await self.run_colmap(source_dir, on_progress)
 
-        await self._notify(on_progress, "running", 30, "Training Dynamic-2DGS model")
+        await self._notify(on_progress, "running", 30, "Training 2DGS model")
         await self.run_train(source_dir, model_base_dir, on_progress)
 
         if not self._latest_point_cloud(model_dir):
@@ -306,30 +306,21 @@ class GSRunner:
 
         cmd = [
             str(self.paths["python"]),
-            str(self.paths["repo"] / "train_gui.py"),
-            "--source_path",
+            str(self.paths["repo"] / "train.py"),
+            "-s",
             str(source_dir),
             "--model_path",
             str(model_base_dir),
-            "--deform_type",
-            config.D2DGS_DEFORM_TYPE,
-            "--resolution",
-            str(config.D2DGS_RESOLUTION),
             "--iterations",
             str(config.D2DGS_ITERATIONS),
             "--save_iterations",
             str(config.D2DGS_ITERATIONS),
             "--test_iterations",
             str(config.D2DGS_ITERATIONS),
+            "--quiet",
         ]
         if config.D2DGS_EVAL:
             cmd.append("--eval")
-        if config.D2DGS_LOAD2GPU_ON_THE_FLY:
-            cmd.append("--load2gpu_on_the_fly")
-        if config.D2DGS_LOCAL_FRAME:
-            cmd.append("--local_frame")
-        if config.D2DGS_GT_ALPHA_MASK_AS_SCENE_MASK:
-            cmd.append("--gt_alpha_mask_as_scene_mask")
 
         percent_pattern = re.compile(r"(\d+)%\|")
         iteration_pattern = re.compile(r"(\d+)/(\d+)")
@@ -354,7 +345,7 @@ class GSRunner:
             mapped = 30 + int(50 * max(0, min(percent, 100)) / 100)
             if mapped >= last_progress + 2 or mapped >= 80:
                 last_progress = mapped
-                await self._notify(on_progress, "running", mapped, "Training Dynamic-2DGS model")
+                await self._notify(on_progress, "running", mapped, "Training 2DGS model")
 
         exit_code = await self.stream_subprocess(
             cmd=cmd,
@@ -363,7 +354,7 @@ class GSRunner:
             on_line=on_line,
         )
         if exit_code != 0:
-            raise RuntimeError(f"Dynamic-2DGS training failed with exit code {exit_code}")
+            raise RuntimeError(f"2DGS training failed with exit code {exit_code}")
 
     async def run_mesh(
         self,
@@ -374,15 +365,12 @@ class GSRunner:
         def _build_cmd(voxel_size: float, depth_trunc: float, num_cluster: int, mesh_res: int) -> list[str]:
             cmd = [
                 str(self.paths["python"]),
-                str(self.paths["repo"] / "render_mesh.py"),
-                "--source_path",
+                str(self.paths["repo"] / "render.py"),
+                "-s",
                 str(source_dir),
-                "--model_path",
+                "-m",
                 str(model_base_dir),
-                "--deform_type",
-                config.D2DGS_DEFORM_TYPE,
-                "--resolution",
-                str(config.D2DGS_RESOLUTION),
+                "--quiet",
                 "--voxel_size",
                 str(voxel_size),
                 "--depth_trunc",
@@ -518,9 +506,7 @@ class GSRunner:
         return env
 
     def _actual_model_path(self, model_base_dir: Path) -> Path:
-        if model_base_dir.name.endswith(config.D2DGS_DEFORM_TYPE):
-            return model_base_dir
-        return model_base_dir.with_name(f"{model_base_dir.name}_{config.D2DGS_DEFORM_TYPE}")
+        return model_base_dir
 
     def _latest_point_cloud(self, model_dir: Path) -> Optional[Path]:
         point_cloud_root = model_dir / "point_cloud"
@@ -543,7 +529,10 @@ class GSRunner:
         return max(candidates, key=lambda p: iteration_number(p.parent))
 
     def _mesh_files(self, model_dir: Path) -> list[Path]:
-        meshes = sorted(model_dir.glob("train/ours_*/frame_*.ply"))
+        meshes = sorted(model_dir.glob("train/ours_*/fuse*_post.ply"))
+        if meshes:
+            return meshes
+        meshes = sorted(model_dir.glob("train/ours_*/fuse*.ply"))
         if meshes:
             return meshes
         return sorted(model_dir.glob("mesh_export/*.ply"))
