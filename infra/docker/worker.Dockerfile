@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DEBIAN_FRONTEND=noninteractive \
     CUDA_HOME=/usr/local/cuda \
     PIP_NO_CACHE_DIR=1 \
-    D2DGS_ROOT=/workspace/repo/services/dynamic-2dgs \
+    D2DGS_ROOT=/workspace/repo/services/2d-gaussian-splatting \
     WHEELHOUSE=/workspace/repo/infra/docker/wheels
 
 WORKDIR /workspace/repo
@@ -56,7 +56,7 @@ RUN python -m pip install --upgrade pip \
 
 COPY apps/worker /workspace/repo/apps/worker
 COPY packages /workspace/repo/packages
-COPY --from=dynamic2dgs . /workspace/repo/services/dynamic-2dgs
+COPY --from=dynamic2dgs . /workspace/repo/services/2d-gaussian-splatting
 COPY --from=wheelhouse . /workspace/repo/infra/docker/wheels
 COPY infra/docker/install-d2dgs-deps.sh /workspace/repo/infra/docker/install-d2dgs-deps.sh
 COPY infra/docker/worker-entrypoint.sh /workspace/repo/infra/docker/worker-entrypoint.sh

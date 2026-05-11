@@ -117,7 +117,7 @@ services:
       context: .
       dockerfile: infra/docker/worker.Dockerfile
       additional_contexts:
-        dynamic2dgs: ../dynamic-2dgs
+        dynamic2dgs: ../2d-gaussian-splatting
         wheelhouse: ../whl
     env_file:
       - .env
@@ -126,7 +126,7 @@ services:
       MYSQL_HOST: mysql
       MYSQL_PORT: 3306
       REDIS_URL: redis://redis:6379/0
-      DYNAMIC_2DGS_ROOT: /workspace/repo/services/dynamic-2dgs
+      DYNAMIC_2DGS_ROOT: /workspace/repo/services/2d-gaussian-splatting
       NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
       NVIDIA_DRIVER_CAPABILITIES: ${NVIDIA_DRIVER_CAPABILITIES:-compute,utility}
       CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES:-0}
@@ -134,7 +134,7 @@ services:
       - ./storage:/workspace/repo/storage
       - ./apps/worker:/workspace/repo/apps/worker:ro
       - ./packages/shared:/workspace/repo/packages/shared:ro
-      - ../dynamic-2dgs:/workspace/repo/services/dynamic-2dgs
+      - ../2d-gaussian-splatting:/workspace/repo/services/2d-gaussian-splatting
     depends_on:
       mysql:
         condition: service_healthy

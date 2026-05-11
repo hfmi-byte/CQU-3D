@@ -13,13 +13,18 @@ class CoreEngineConfig:
         repo_root = Path(__file__).resolve().parents[3]
         default_candidates = [
             Path(settings.dynamic_2dgs_root),
+            repo_root / "services" / "2d-gaussian-splatting",
             repo_root / "services" / "dynamic-2dgs",
+            repo_root.parent / "2d-gaussian-splatting",
             repo_root.parent / "dynamic-2dgs",
         ]
         default_gs_repo = next((path for path in default_candidates if path.exists()), default_candidates[0])
 
         self.GS_PYTHON = os.getenv("GS_PYTHON", settings.gs_python or sys.executable)
-        self.GS_REPO_DIR = os.getenv("DYNAMIC_2DGS_ROOT", os.getenv("GS_REPO_DIR", str(default_gs_repo)))
+        self.GS_REPO_DIR = os.getenv(
+            "DYNAMIC_2DGS_ROOT",
+            os.getenv("GAUSSIAN_2DGS_ROOT", os.getenv("GS_REPO_DIR", str(default_gs_repo))),
+        )
         self.COLMAP_BIN = os.getenv("COLMAP_BIN", settings.colmap_bin or shutil.which("colmap") or "colmap")
         self.FFMPEG_BIN = os.getenv("FFMPEG_BIN", settings.ffmpeg_bin or shutil.which("ffmpeg") or "ffmpeg")
 
@@ -97,7 +102,7 @@ class CoreEngineConfig:
         if not repo_path.exists() or not repo_path.is_dir():
             raise ValueError(f"DYNAMIC_2DGS_ROOT 不存在: {repo_path}")
 
-        required_scripts = ["convert.py", "train_gui.py", "render_mesh.py"]
+        required_scripts = ["convert.py", "train.py", "render.py"]
         missing = [name for name in required_scripts if not (repo_path / name).exists()]
         if missing:
             raise ValueError(f"dynamic-2dgs 缺少脚本: {', '.join(missing)}")
